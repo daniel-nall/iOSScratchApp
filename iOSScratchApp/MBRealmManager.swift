@@ -12,11 +12,11 @@ class MBRealmManager {
         }
     }
     
-    func loadPlaylistFromRealm(id: String, completion: (Playlist?) -> Void) {
+    func loadPlaylistFromRealm(id: String, completion: (Bool, Playlist) -> Void) {
         if let result = realm.objects(Playlist).filter("id == '\(id)'").first {
-            completion(result)
+            completion(true, result)
         } else {
-            completion(nil)
+            completion(false, Playlist())
         }
     }
     

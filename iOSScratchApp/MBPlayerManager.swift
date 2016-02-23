@@ -1,5 +1,6 @@
 import Foundation
 import AVFoundation
+import RealmSwift
 
 enum PlayState {
     case Playing
@@ -14,7 +15,7 @@ class MBPlayerManager: NSObject {
     var audioSession: AVAudioSession = AVAudioSession.sharedInstance()
     var audioPlayer: AVPlayer?
     
-    var songList: [Song]?
+    var songList: List<Song>?
     var currentSong: Song?
     var currentSongIndex: Int?
     
@@ -60,7 +61,7 @@ class MBPlayerManager: NSObject {
     }
     
     // MARK: audio functions
-    func loadNewPlaylist(list: [Song], index: Int, completion: () -> Void) {
+    func loadNewPlaylist(list: List<Song>, index: Int, completion: () -> Void) {
         if let selectedSongId = list[index].id {
             MBAPIHandler.sharedInstance.getSongInfo(selectedSongId) {
                 result in
