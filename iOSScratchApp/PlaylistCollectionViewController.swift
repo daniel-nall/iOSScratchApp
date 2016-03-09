@@ -30,7 +30,7 @@ class PlaylistCollectionViewController: UIViewController, UICollectionViewDataSo
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("playlistTile", forIndexPath: indexPath) as! PlaylistCollectionViewCell
-        if let name = playlistCollection?[indexPath.row].name, let imageURL = playlistCollection?[indexPath.row].image?.getImageURL() {
+        if let name = playlistCollection?[indexPath.row].name, let imageURL = playlistCollection?[indexPath.row].image?.getImageURL(.LargeImage) {
             cell.playlistName.text = name
             cell.playlistImage.sd_setImageWithURL(NSURL(string: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor())) {
                 _ in

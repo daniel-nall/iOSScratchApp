@@ -2,12 +2,18 @@ import Foundation
 import ObjectMapper
 import RealmSwift
 
+enum ImageSize {
+    case SmallImage
+    case LargeImage
+}
+
 class MBImage: Object, Mappable {
-    var basePath: String?
-    var fileName: String?
-    var id: String?
-    var smallImageURL: String?
-    dynamic var localPath: String?
+    dynamic var basePath: String?
+    dynamic var fileName: String?
+    dynamic var id: String?
+    dynamic var smallImageURL: String?
+    dynamic var largeLocalPath: String?
+    dynamic var smallLocalPath: String?
     dynamic var RLMDelete = false
     
     required convenience init?(_ map: Map) {
@@ -21,15 +27,27 @@ class MBImage: Object, Mappable {
         smallImageURL <- map["small_image_url"]
     }
     
-    func getImageURL() -> String? {
-        if let path = basePath, let file = fileName {
-            return "\(path)/\(file)"
-        } else {
-            return nil
+    func getImageURL(size: ImageSize) -> String? {
+        switch size {
+        case .SmallImage:
+            if let path = smallLocalPath {
+                return path
+            } else {
+                if let path = smallImageURL {
+                    return path
+                }
+            }
+            break
+        case .LargeImage:
+            if let path = largeLocalPath {
+                return path
+            } else {
+                if let path = basePath, let file = fileName {
+                    return "\(path)/\(file)"
+                }
+            }
+            break
         }
-    }
-    
-    override static func ignoredProperties() -> [String] {
-        return ["basePath", "fileName", "smallImageURL"]
+        return nil
     }
 }

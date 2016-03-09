@@ -1,5 +1,6 @@
 import Foundation
 import AVFoundation
+import MediaPlayer
 import RealmSwift
 
 enum PlayState {
@@ -35,6 +36,23 @@ class MBPlayerManager: NSObject {
             self.audioPlayer = AVPlayer(URL: theURL)
         }
         
+        if let songName = currentSong?.name, let albumName = currentSong?.album?.name, let albumImageURL = currentSong?.album?.image?.getImageURL(.LargeImage), let albumImageNSURL = NSURL(string: albumImageURL), let albumImageData = NSData(contentsOfURL: albumImageNSURL), let albumUIImage = UIImage(data: albumImageData), let artistName = currentSong?.album?.artist?.name {
+            let albumArt = MPMediaItemArtwork(image: albumUIImage)
+            MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [
+                MPMediaItemPropertyTitle: songName,
+                MPMediaItemPropertyAlbumTitle: albumName,
+                MPMediaItemPropertyArtwork: albumArt,
+                MPMediaItemPropertyArtist: artistName
+            ]
+        }
+        
+        MPRemoteCommandCenter.sharedCommandCenter().playCommand.addTarget(self, action: "togglePlay")
+        MPRemoteCommandCenter.sharedCommandCenter().pauseCommand.addTarget(self, action: "togglePlay")
+        MPRemoteCommandCenter.sharedCommandCenter().previousTrackCommand.addTarget(self, action: "previousSong")
+        MPRemoteCommandCenter.sharedCommandCenter().nextTrackCommand.addTarget(self, action: "nextSong")
+        
+        UIApplication.sharedApplication().beginReceivingRemoteControlEvents()
+        
         if let thePlayer = audioPlayer {
             NSNotificationCenter.defaultCenter().addObserver(self, selector: "playerDidFinishPlaying:", name: AVPlayerItemDidPlayToEndTimeNotification, object: thePlayer.currentItem)
             self.playAudio()
@@ -60,24 +78,35 @@ class MBPlayerManager: NSObject {
         }
     }
     
-    // MARK: audio functions
+    // MARK: load functions
     func loadNewPlaylist(list: List<Song>, index: Int, completion: () -> Void) {
-        if let selectedSongId = list[index].id {
-            MBAPIHandler.sharedInstance.getSongInfo(selectedSongId) {
-                result in
-                self.songList = list
-                self.currentSong = result
-                self.currentSongIndex = index
-                MBAPIHandler.sharedInstance.getSongURL(selectedSongId) {
+        songList = list
+        currentSong = list[index]
+        currentSongIndex = index
+        fetchSongURL(index) {
+            completion()
+        }
+    }
+    
+    func fetchSongURL(index: Int, completion: (() -> Void)?) {
+        if let songURL = self.currentSong?.songURL {
+            self.setupAudioPlayer(songURL)
+            self.delegate?.didStartNewSong()
+            completion?()
+        } else {
+            if let songId = songList?[index].id {
+                MBAPIHandler.sharedInstance.getSongURL(songId) {
                     result in
                     self.setupAudioPlayer(result)
                     self.currentSong?.songURL = result
+                    self.delegate?.didStartNewSong()
+                    completion?()
                 }
-                completion()
             }
         }
     }
     
+    // MARK: audio functions
     func togglePlay() {
         if playState == .Playing {
             self.pauseAudio()
@@ -96,28 +125,18 @@ class MBPlayerManager: NSObject {
     }
     
     private func pauseAudio(interrupt: Bool = false) {
-        self.audioPlayer?.pause()
+        audioPlayer?.pause()
         if !interrupt {
-            self.playState = .Paused
+            playState = .Paused
         }
         self.delegate?.isPausing()
     }
     
     func nextSong() {
         if let index = self.currentSongIndex, let list = songList where index != list.count - 1 {
-            if let newSongId = list[index + 1].id {
-                MBAPIHandler.sharedInstance.getSongInfo(newSongId) {
-                    result in
-                    self.currentSong = result
-                    self.currentSongIndex = index + 1
-                    MBAPIHandler.sharedInstance.getSongURL(newSongId) {
-                        result in
-                        self.setupAudioPlayer(result)
-                        self.currentSong?.songURL = result
-                    }
-                    self.delegate?.didStartNewSong()
-                }
-            }
+            currentSong = list[index + 1]
+            currentSongIndex = index + 1
+            fetchSongURL(index + 1, completion: nil)
         } else {
             pauseAudio()
             self.delegate?.didFinishPlaying()
@@ -126,19 +145,9 @@ class MBPlayerManager: NSObject {
     
     func previousSong() {
         if let index = self.currentSongIndex, let list = songList where index != 0 {
-            if let newSongId = list[index - 1].id {
-                MBAPIHandler.sharedInstance.getSongInfo(newSongId) {
-                    result in
-                    self.currentSong = result
-                    self.currentSongIndex = index - 1
-                    MBAPIHandler.sharedInstance.getSongURL(newSongId) {
-                        result in
-                        self.setupAudioPlayer(result)
-                        self.currentSong?.songURL = result
-                    }
-                    self.delegate?.didStartNewSong()
-                }
-            }
+            currentSong = list[index - 1]
+            currentSongIndex = index - 1
+            fetchSongURL(index - 1, completion: nil)
         } else {
             pauseAudio()
             self.delegate?.didFinishPlaying()

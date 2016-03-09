@@ -70,8 +70,8 @@ class MBAPIHandler {
         if let theToken = userToken {
             Alamofire.request(.GET, requestURL, headers: ["X-Token": theToken]).responseJSON {
                 response in
-                if let theResponse = response.result.value as? [String: String] {
-                    songURL = theResponse["url"]
+                if let theResponse = response.result.value as? [String : AnyObject] {
+                    songURL = theResponse["url"] as? String
                 }
                 completion(songURL)
             }
