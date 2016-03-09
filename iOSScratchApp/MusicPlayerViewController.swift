@@ -15,13 +15,7 @@ class MusicPlayerViewController: UIViewController, MBPlayerManagerDelegate {
         
         MBPlayerManager.sharedInstance.delegate = self
         
-        if let imageURL = MBPlayerManager.sharedInstance.currentSong?.album?.image?.getImageURL(), let duration = MBPlayerManager.sharedInstance.currentSong?.duration {
-            albumImage.sd_setImageWithURL(NSURL(string: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor()))
-            if let durationFloat = Float(duration) {
-                seekBar.maximumValue = durationFloat
-            }
-        }
-        self.title = MBPlayerManager.sharedInstance.currentSong?.name
+        didStartNewSong()
     }
     
     // MARK: IBActions
@@ -64,7 +58,7 @@ class MusicPlayerViewController: UIViewController, MBPlayerManagerDelegate {
     }
     
     func didStartNewSong() {
-        if let imageURL = MBPlayerManager.sharedInstance.currentSong?.album?.image?.getImageURL(), let duration = MBPlayerManager.sharedInstance.currentSong?.duration {
+        if let imageURL = MBPlayerManager.sharedInstance.currentSong?.album?.image?.getImageURL(.LargeImage), let duration = MBPlayerManager.sharedInstance.currentSong?.duration {
             albumImage.sd_setImageWithURL(NSURL(string: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor()))
             if let durationFloat = Float(duration) {
                 seekBar.maximumValue = durationFloat
