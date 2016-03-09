@@ -23,6 +23,17 @@ class MBPlayerManager: NSObject {
     var playState: PlayState?
     
     // MARK: Setup
+    override init() {
+        super.init()
+        
+        MPRemoteCommandCenter.sharedCommandCenter().playCommand.addTarget(self, action: "togglePlay")
+        MPRemoteCommandCenter.sharedCommandCenter().pauseCommand.addTarget(self, action: "togglePlay")
+        MPRemoteCommandCenter.sharedCommandCenter().previousTrackCommand.addTarget(self, action: "previousSong")
+        MPRemoteCommandCenter.sharedCommandCenter().nextTrackCommand.addTarget(self, action: "nextSong")
+        
+        UIApplication.sharedApplication().beginReceivingRemoteControlEvents()
+    }
+    
     func setupAudioSession() {
         do {
             try audioSession.setCategory(AVAudioSessionCategoryPlayback)
@@ -45,13 +56,6 @@ class MBPlayerManager: NSObject {
                 MPMediaItemPropertyArtist: artistName
             ]
         }
-        
-        MPRemoteCommandCenter.sharedCommandCenter().playCommand.addTarget(self, action: "togglePlay")
-        MPRemoteCommandCenter.sharedCommandCenter().pauseCommand.addTarget(self, action: "togglePlay")
-        MPRemoteCommandCenter.sharedCommandCenter().previousTrackCommand.addTarget(self, action: "previousSong")
-        MPRemoteCommandCenter.sharedCommandCenter().nextTrackCommand.addTarget(self, action: "nextSong")
-        
-        UIApplication.sharedApplication().beginReceivingRemoteControlEvents()
         
         if let thePlayer = audioPlayer {
             NSNotificationCenter.defaultCenter().addObserver(self, selector: "playerDidFinishPlaying:", name: AVPlayerItemDidPlayToEndTimeNotification, object: thePlayer.currentItem)
