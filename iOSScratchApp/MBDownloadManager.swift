@@ -16,7 +16,6 @@ class MBDownloadManger {
                 MBAPIHandler.sharedInstance.getSongURL(id) {
                     result in
                     download.downloadStateRaw = "Pending"
-                    print(download.state)
                     download.songId = song.id
                     download.songURL = result
                     download.largeImagePath = song.album?.image?.getImageURL(.LargeImage)

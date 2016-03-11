@@ -40,6 +40,7 @@ class MBPlayerManager: NSObject {
         } catch {}
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "audioSessionWasInterrupted:", name: AVAudioSessionInterruptionNotification, object: audioSession)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "routeHasChanged:", name: AVAudioSessionRouteChangeNotification, object: nil)
     }
     
     func setupAudioPlayer(url: String?) {
@@ -47,13 +48,14 @@ class MBPlayerManager: NSObject {
             self.audioPlayer = AVPlayer(URL: theURL)
         }
         
-        if let songName = currentSong?.name, let albumName = currentSong?.album?.name, let albumImageURL = currentSong?.album?.image?.getImageURL(.LargeImage), let albumImageNSURL = NSURL(string: albumImageURL), let albumImageData = NSData(contentsOfURL: albumImageNSURL), let albumUIImage = UIImage(data: albumImageData), let artistName = currentSong?.album?.artist?.name {
+        if let songName = currentSong?.name, let albumName = currentSong?.album?.name, let albumImageURL = currentSong?.album?.image?.getImageURL(.LargeImage), let albumImageNSURL = NSURL(string: albumImageURL), let albumImageData = NSData(contentsOfURL: albumImageNSURL), let albumUIImage = UIImage(data: albumImageData), let artistName = currentSong?.album?.artist?.name, let duration = currentSong?.duration {
             let albumArt = MPMediaItemArtwork(image: albumUIImage)
             MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [
                 MPMediaItemPropertyTitle: songName,
                 MPMediaItemPropertyAlbumTitle: albumName,
                 MPMediaItemPropertyArtwork: albumArt,
-                MPMediaItemPropertyArtist: artistName
+                MPMediaItemPropertyArtist: artistName,
+                MPMediaItemPropertyPlaybackDuration: duration
             ]
         }
         
@@ -79,6 +81,13 @@ class MBPlayerManager: NSObject {
                     playAudio()
                 }
             }
+        }
+    }
+    
+    func routeHasChanged(notification: NSNotification) {
+        if let userInfo = notification.userInfo, let reason = AVAudioSessionRouteChangeReason(rawValue: userInfo[AVAudioSessionRouteChangeReasonKey] as! UInt) where reason == .OldDeviceUnavailable {
+            self.playState = .Paused
+            self.delegate?.isPausing()
         }
     }
     
