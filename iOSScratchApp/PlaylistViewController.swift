@@ -1,3 +1,4 @@
+import Foundation
 import UIKit
 import RealmSwift
 
@@ -49,12 +50,32 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         let cell = tableView.dequeueReusableCellWithIdentifier("songCell") as! PlaylistTableViewCell
         if let name = playlist.RLMsongs[indexPath.row].name, let imageURL = playlist.RLMsongs[indexPath.row].album?.image?.getImageURL(.SmallImage) {
             cell.songName.text = name
-            cell.albumImage.sd_setImageWithURL(NSURL(string: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor())) {
-                _ in
-                cell.albumImage.fadeIn(completion: nil)
+            
+            let range = imageURL.rangeOfString("http")
+            if let theRange = range where theRange.startIndex == imageURL.startIndex { // imageURL starts with "http" (remote url)
+                cell.albumImage.sd_setImageWithURL(NSURL(string: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor())) {
+                    _ in
+                    cell.albumImage.fadeIn(completion: nil)
+                }
+            } else {
+//                let documentsDir = applicationDocumentsDirectory()
+//                let filePath = documentsDir!.URLByAppendingPathComponent((playlist.RLMsongs[indexPath.row].album?.image?.smallLocalFileName)!)
+//                print(filePath)
+//                print(imageURL)
+                
+                //cell.albumImage.image = UIImage(contentsOfFile: imageURL)
+                cell.albumImage.sd_setImageWithURL(NSURL(fileURLWithPath: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor()))
             }
         }
         return cell
+    }
+    
+    func applicationDocumentsDirectory() -> NSURL? {
+        
+        let paths : NSArray = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, NSSearchPathDomainMask.UserDomainMask, true)
+        let basePath: AnyObject! = (paths.count > 0) ? paths.objectAtIndex(0) : nil
+        
+        return NSURL(fileURLWithPath: basePath as! String, isDirectory: true)
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {

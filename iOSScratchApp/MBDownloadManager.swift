@@ -58,27 +58,27 @@ class MBDownloadManger {
         if let songId = item.songId, let songURL = item.songURL, let largeImagePath = item.largeImagePath, let smallImagePath = item.smallImagePath {
             dispatch_group_enter(downloadGroup)
             download(songURL) {
-                path in
-                if let localPath = path {
-                    MBRealmManager.sharedInstance.updateSongURL(songId, localPath: localPath)
+                file in
+                if let fileName = file {
+                    MBRealmManager.sharedInstance.updateLocalSongFile(songId, localFile: fileName)
                 }
                 dispatch_group_leave(downloadGroup)
             }
             
             dispatch_group_enter(downloadGroup)
             download(largeImagePath) {
-                path in
-                if let localPath = path {
-                    MBRealmManager.sharedInstance.updateLargeImageURL(songId, localPath: localPath)
+                file in
+                if let fileName = file {
+                    MBRealmManager.sharedInstance.updateLargeImageFile(songId, localFile: fileName)
                 }
                 dispatch_group_leave(downloadGroup)
             }
             
             dispatch_group_enter(downloadGroup)
             download(smallImagePath) {
-                path in
-                if let localPath = path {
-                    MBRealmManager.sharedInstance.updateSmallImageURL(songId, localPath: localPath)
+                file in
+                if let fileName = file {
+                    MBRealmManager.sharedInstance.updateSmallImageFile(songId, localFile: fileName)
                 }
                 dispatch_group_leave(downloadGroup)
             }
@@ -103,7 +103,7 @@ class MBDownloadManger {
             } else {
                 localPath = destination(NSURL(string: "")!, response!)
             }
-            completion(localPath?.absoluteString)
+            completion(localPath?.lastPathComponent)
         }
     }
 }

@@ -44,8 +44,20 @@ class MBPlayerManager: NSObject {
     }
     
     func setupAudioPlayer(url: String?) {
-        if let urlString = url, let theURL = NSURL(string: urlString) {
-            self.audioPlayer = AVPlayer(URL: theURL)
+        if let theURL = url {
+            var theNSURL: NSURL?
+            
+            let range = url?.rangeOfString("http")
+            if let theRange = range where theRange.startIndex == url?.startIndex { // imageURL starts with "http" (remote url)
+                theNSURL = NSURL(string: theURL)
+            } else {
+                theNSURL = NSURL(fileURLWithPath: theURL, isDirectory: false)
+            }
+            
+            
+            if let songURL = theNSURL {
+                self.audioPlayer = AVPlayer(URL: songURL)
+            }
         }
         
         if let songName = currentSong?.name, let albumName = currentSong?.album?.name, let albumImageURL = currentSong?.album?.image?.getImageURL(.LargeImage), let albumImageNSURL = NSURL(string: albumImageURL), let albumImageData = NSData(contentsOfURL: albumImageNSURL), let albumUIImage = UIImage(data: albumImageData), let artistName = currentSong?.album?.artist?.name, let duration = currentSong?.duration {
@@ -102,7 +114,7 @@ class MBPlayerManager: NSObject {
     }
     
     func fetchSongURL(index: Int, completion: (() -> Void)?) {
-        if let songURL = self.currentSong?.songURL {
+        if let songURL = self.currentSong?.songFile {
             self.setupAudioPlayer(songURL)
             self.delegate?.didStartNewSong()
             completion?()
@@ -111,7 +123,7 @@ class MBPlayerManager: NSObject {
                 MBAPIHandler.sharedInstance.getSongURL(songId) {
                     result in
                     self.setupAudioPlayer(result)
-                    self.currentSong?.songURL = result
+                    self.currentSong?.songFile = result
                     self.delegate?.didStartNewSong()
                     completion?()
                 }

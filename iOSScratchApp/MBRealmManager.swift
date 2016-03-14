@@ -39,29 +39,29 @@ class MBRealmManager {
     }
     
     // MARK: update functions
-    func updateSongURL(id: String, localPath: String) {
+    func updateLocalSongFile(id: String, localFile: String) {
         let songs = realm.objects(Song).filter("id == '\(id)'")
         try! realm.write {
             for song in songs {
-                song.songURL = localPath
+                song.songFile = localFile
             }
         }
     }
     
-    func updateLargeImageURL(id: String, localPath: String) {
+    func updateLargeImageFile(id: String, localFile: String) {
         let songs = realm.objects(Song).filter("id == '\(id)'")
         try! realm.write {
             for song in songs {
-                song.album?.image?.largeLocalPath = localPath
+                song.album?.image?.largeLocalFileName = localFile
             }
         }
     }
     
-    func updateSmallImageURL(id: String, localPath: String) {
+    func updateSmallImageFile(id: String, localFile: String) {
         let songs = realm.objects(Song).filter("id == '\(id)'")
         try! realm.write {
             for song in songs {
-                song.album?.image?.smallLocalPath = localPath
+                song.album?.image?.smallLocalFileName = localFile
             }
         }
     }
