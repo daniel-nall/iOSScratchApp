@@ -4,16 +4,6 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>AWSCore.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
-		<key>AWSSNS.xcscheme</key>
-		<dict>
-			<key>isShown</key>
-			<false/>
-		</dict>
 		<key>Alamofire.xcscheme</key>
 		<dict>
 			<key>isShown</key>
@@ -57,17 +47,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>1F9F3C55EAC4E04772A039E1096648CE</key>
+		<key>100EE211FA4395826B7304E2A0D9B2FF</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>32931EB10B1BF1CC3497185FE0E34696</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>36C14E3C34A8663C773C92196FFBDB74</key>
+		<key>120AA0B23D20118B0D517260E2F7168F</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -77,17 +62,12 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>7051517F12CD2BBD8AE2AD214DB4EC0C</key>
+		<key>93963A3B9E14192A494444B50A25403D</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>B7A88BE52F80621A6E4CB5F2BE966DDD</key>
-		<dict>
-			<key>primary</key>
-			<true/>
-		</dict>
-		<key>C2B601633B166C27D46BB83BC8F0BB9E</key>
+		<key>ADE446BF4900158B65BA85FF6FEEE836</key>
 		<dict>
 			<key>primary</key>
 			<true/>
@@ -97,7 +77,7 @@
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>D57E086877841560A20B233282E5DBDF</key>
+		<key>E68473DFB7889C2C1F38AED373E17A34</key>
 		<dict>
 			<key>primary</key>
 			<true/>

@@ -194,13 +194,11 @@ private:
 inline ArrayInteger::ArrayInteger(Array::no_prealloc_tag) noexcept:
     Array(Array::no_prealloc_tag())
 {
-    m_is_inner_bptree_node = false;
 }
 
 inline ArrayInteger::ArrayInteger(Allocator& alloc) noexcept:
     Array(alloc)
 {
-    m_is_inner_bptree_node = false;
 }
 
 inline void ArrayInteger::add(int64_t value)

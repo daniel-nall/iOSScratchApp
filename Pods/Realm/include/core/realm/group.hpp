@@ -31,7 +31,6 @@
 #include <realm/exceptions.hpp>
 #include <realm/impl/input_stream.hpp>
 #include <realm/impl/output_stream.hpp>
-#include <realm/impl/continuous_transactions_history.hpp>
 #include <realm/table.hpp>
 #include <realm/table_basic_fwd.hpp>
 #include <realm/alloc_slab.hpp>
@@ -82,8 +81,7 @@ public:
 
     /// Equivalent to calling open(const std::string&, const char*, OpenMode)
     /// on an unattached group accessor.
-    explicit Group(const std::string& file, const char* encryption_key = nullptr,
-                   OpenMode = mode_ReadOnly);
+    explicit Group(const std::string& file, const char* encryption_key = nullptr, OpenMode = mode_ReadOnly);
 
     /// Equivalent to calling open(BinaryData, bool) on an unattached
     /// group accessor. Note that if this constructor throws, the
@@ -545,8 +543,7 @@ public:
 private:
     SlabAlloc m_alloc;
 
-    /// `m_top` is the root node (or top array) of the Realm, and has the
-    /// following layout:
+    /// `m_top` is the root node of the Realm, and has the following layout:
     ///
     /// <pre>
     ///
@@ -559,38 +556,25 @@ private:
     ///   5th   GroupWriter::m_free_lengths   (optional)
     ///   6th   GroupWriter::m_free_versions  (optional)
     ///   7th   Transaction number / version  (optional)
-    ///   8th   In-Realm history type         (optional)
-    ///   9th   In-Realm history ref          (optional)
+    ///   8th   Synchronization history       (optional)
+    ///
     ///
     /// </pre>
     ///
-    /// The 'in-Realm history type' slot stores a value of
-    /// Replication::HistoryType, although never
-    /// Replication::hist_OutOfRealm. For more information about that, see
-    /// Replication::get_history_type().
-    ///
     /// The first three entries are mandatory. In files created by
-    /// Group::write(), none of the optional entries are present and the size of
-    /// `m_top` is 3. In files updated by Group::commit(), the 4th and 5th entry
-    /// is present, and the size of `m_top` is 5. In files updated by way of a
-    /// transaction (SharedGroup::commit()), the 4th, 5th, 6th, and 7th entry is
-    /// present, and the size of `m_top` is 7. In files that contain a changeset
-    /// history, the 8th and 9th entry is present.
-    ///
-    /// When a group accessor is attached to a newly created file or an empty
-    /// memory buffer where there is no top array yet, `m_top`, `m_tables`, and
-    /// `m_table_names` with be left in the detached state until the initiation
-    /// of the first write transaction. In particular, they will remain in the
-    /// detached state during read transactions that precede the first write
-    /// transaction.
+    /// Group::write(), none of the optional entries are present. In files
+    /// updated by Group::commit(), the 4th and 5th entry is present. In files
+    /// updated by way of a transaction (SharedGroup::commit()), the 4th, 5th,
+    /// 6th, and 7th entry is present.
     Array m_top;
     ArrayInteger m_tables;
     ArrayString m_table_names;
 
+    static constexpr int s_sync_history_ndx_in_parent = 7;
+
     typedef std::vector<Table*> table_accessors;
     mutable table_accessors m_table_accessors;
 
-    bool m_attached = false;
     const bool m_is_shared;
 
     std::function<void (const CascadeNotification&)> m_notify_handler;
@@ -602,26 +586,21 @@ private:
     void init_array_parents() noexcept;
 
     /// If `top_ref` is not zero, attach this group accessor to the specified
-    /// underlying node structure. If `top_ref` is zero and \a
-    /// create_group_when_missing is true, create a new node structure that
-    /// represents an empty group, and attach this group accessor to it. It is
-    /// an error to call this function on an already attached group accessor.
-    void attach(ref_type top_ref, bool create_group_when_missing);
+    /// underlying node structure. If `top_ref` is zero, create a new node
+    /// structure that represents an empty group, and attach this group accessor
+    /// to it. It is an error to call this function on an already attached group
+    /// accessor.
+    void attach(ref_type top_ref);
 
     /// Detach this group accessor from the underlying node structure. If this
     /// group accessors is already in the detached state, this function does
     /// nothing (idempotency).
     void detach() noexcept;
 
-    /// \param writable Must be set to true when, and only when attaching for a
-    /// write transaction.
-    void attach_shared(ref_type new_top_ref, size_t new_file_size, bool writable);
-
-    void create_empty_group();
+    void attach_shared(ref_type new_top_ref, size_t new_file_size);
 
     void reset_free_space_tracking();
 
-    void remap(size_t new_file_size);
     void remap_and_update_refs(ref_type new_top_ref, size_t new_file_size);
 
     /// Recursively update refs stored in all cached array
@@ -651,8 +630,7 @@ private:
     class TableWriter;
     class DefaultTableWriter;
 
-    static void write(std::ostream&, const Allocator&, TableWriter&, bool no_top_array,
-                      bool pad_for_encryption, uint_fast64_t version_number);
+    static void write(std::ostream&, TableWriter&, bool, uint_fast64_t = 0);
 
     typedef void (*DescSetter)(Table&);
     typedef bool (*DescMatcher)(const Spec&);
@@ -684,21 +662,18 @@ private:
     Replication* get_replication() const noexcept;
     void set_replication(Replication*) noexcept;
     class TransactAdvancer;
-    void advance_transact(ref_type new_top_ref, size_t new_file_size, _impl::NoCopyInputStream&);
+    void advance_transact(ref_type new_top_ref, size_t new_file_size,
+                          _impl::NoCopyInputStream&);
     void refresh_dirty_accessors();
     template<class F>
     void update_table_indices(F&& map_function);
 
-    int get_file_format_version() const noexcept;
-    void set_file_format_version(int) noexcept;
-    int get_committed_file_format_version() const noexcept;
-
-    /// The specified history type must be a value of Replication::HistoryType.
-    static int get_target_file_format_version_for_session(int current_file_format_version,
-                                                          int history_type) noexcept;
+    int get_file_format() const noexcept;
+    void set_file_format(int) noexcept;
+    int get_committed_file_format() const noexcept;
 
     /// Must be called from within a write transaction
-    void upgrade_file_format(int target_file_format_version);
+    void upgrade_file_format();
 
 #ifdef REALM_DEBUG
     std::pair<ref_type, size_t>
@@ -708,12 +683,7 @@ private:
     void send_cascade_notification(const CascadeNotification& notification) const;
     void send_schema_change_notification() const;
 
-    static void get_version_and_history_type(const Array& top,
-                                             _impl::History::version_type& version,
-                                             int& history_type) noexcept;
-    static ref_type get_history_ref(const Array& top) noexcept;
-    void set_history_parent(Array& history_root) noexcept;
-    void prepare_history_parent(Array& history_root, int history_type);
+    void set_sync_history_parent(Array& sync_history_root);
 
     friend class Table;
     friend class GroupWriter;
@@ -730,6 +700,19 @@ private:
 
 
 // Implementation
+
+inline Group::Group():
+    m_alloc(), // Throws
+    m_top(m_alloc),
+    m_tables(m_alloc),
+    m_table_names(m_alloc),
+    m_is_shared(false)
+{
+    init_array_parents();
+    m_alloc.attach_empty(); // Throws
+    ref_type top_ref = 0; // Instantiate a new empty group
+    attach(top_ref); // Throws
+}
 
 inline Group::Group(const std::string& file, const char* key, OpenMode mode):
     m_alloc(), // Throws
@@ -781,25 +764,23 @@ inline Group::Group(shared_tag) noexcept:
 
 inline bool Group::is_attached() const noexcept
 {
-    return m_attached;
+    return m_top.is_attached();
 }
 
 inline bool Group::is_empty() const noexcept
 {
     if (!is_attached())
         return false;
-    if (m_table_names.is_attached())
-        return m_table_names.is_empty();
-    return true;
+    REALM_ASSERT(m_table_names.is_attached());
+    return m_table_names.is_empty();
 }
 
 inline size_t Group::size() const noexcept
 {
     if (!is_attached())
         return 0;
-    if (m_table_names.is_attached())
-        return m_table_names.size();
-    return 0;
+    REALM_ASSERT(m_table_names.is_attached());
+    return m_table_names.size();
 }
 
 inline StringData Group::get_table_name(size_t table_ndx) const
@@ -819,9 +800,9 @@ inline size_t Group::find_table(StringData name) const noexcept
 {
     if (!is_attached())
         return 0;
-    if (m_table_names.is_attached())
-        return m_table_names.find_first(name);
-    return not_found;
+    REALM_ASSERT(m_table_names.is_attached());
+    size_t ndx = m_table_names.find_first(name);
+    return ndx;
 }
 
 inline TableRef Group::get_table(size_t table_ndx)
@@ -1070,55 +1051,13 @@ inline void Group::send_schema_change_notification() const
         m_schema_change_handler();
 }
 
-inline void Group::get_version_and_history_type(const Array& top,
-                                                _impl::History::version_type& version,
-                                                int& history_type) noexcept
+inline void Group::set_sync_history_parent(Array& sync_history_root)
 {
-    _impl::History::version_type version_2 = 0;
-    int history_type_2 = 0;
-    if (top.is_attached()) {
-        if (top.size() >= 6) {
-            REALM_ASSERT(top.size() >= 7);
-            version_2 = _impl::History::version_type(top.get(6) / 2);
-        }
-        if (top.size() >= 8) {
-            REALM_ASSERT(top.size() >= 9);
-            history_type_2 = int(top.get(7) / 2);
-        }
-    }
-    // Version 0 is not a legal initial version, so it has to be set to 1
-    // instead.
-    if (version_2 == 0)
-        version_2 = 1;
-    version      = version_2;
-    history_type = history_type_2;
-}
-
-inline ref_type Group::get_history_ref(const Array& top) noexcept
-{
-    if (top.is_attached()) {
-        if (top.size() >= 8) {
-            REALM_ASSERT(top.size() >= 9);
-            return top.get_as_ref(8);
-        }
-    }
-    return 0;
-}
-
-inline void Group::set_history_parent(Array& history_root) noexcept
-{
-    history_root.set_parent(&m_top, 8);
-}
-
-inline void Group::prepare_history_parent(Array& history_root, int history_type)
-{
-    REALM_ASSERT(m_alloc.get_file_format_version() >= 4);
-    // Ensure that there are slots for both the history type and the history
-    // ref.
-    while (m_top.size() < 9)
+    REALM_ASSERT(m_top.is_attached());
+    REALM_ASSERT(m_top.size() >= 3);
+    while (m_top.size() <= s_sync_history_ndx_in_parent)
         m_top.add(0); // Throws
-    m_top.set(7, RefOrTagged::make_tagged(history_type)); // Throws
-    set_history_parent(history_root);
+    sync_history_root.set_parent(&m_top, s_sync_history_ndx_in_parent);
 }
 
 class Group::TableWriter {
@@ -1237,20 +1176,14 @@ public:
         group.detach();
     }
 
-    static void attach_shared(Group& group, ref_type new_top_ref, size_t new_file_size,
-                              bool writable)
+    static void attach_shared(Group& group, ref_type new_top_ref, size_t new_file_size)
     {
-        group.attach_shared(new_top_ref, new_file_size, writable); // Throws
+        group.attach_shared(new_top_ref, new_file_size); // Throws
     }
 
     static void reset_free_space_tracking(Group& group)
     {
         group.reset_free_space_tracking(); // Throws
-    }
-
-    static void remap(Group& group, size_t new_file_size)
-    {
-        group.remap(new_file_size); // Throws
     }
 
     static void remap_and_update_refs(Group& group, ref_type new_top_ref, size_t new_file_size)
@@ -1264,72 +1197,10 @@ public:
         group.advance_transact(new_top_ref, new_file_size, in); // Throws
     }
 
-    static void create_empty_group_when_missing(Group& group)
+    static void set_sync_history_parent(Group& group, Array& sync_history_root)
     {
-        if (!group.m_top.is_attached())
-            group.create_empty_group(); // Throws
+        group.set_sync_history_parent(sync_history_root); // Throws
     }
-
-    static void get_version_and_history_type(Allocator& alloc, ref_type top_ref,
-                                             _impl::History::version_type& version,
-                                             int& history_type) noexcept
-    {
-        Array top(alloc);
-        if (top_ref != 0)
-            top.init_from_ref(top_ref);
-        Group::get_version_and_history_type(top, version, history_type);
-    }
-
-    static ref_type get_history_ref(const Group& group) noexcept
-    {
-        return Group::get_history_ref(group.m_top);
-    }
-
-    static ref_type get_history_ref(Allocator& alloc, ref_type top_ref) noexcept
-    {
-        Array top(alloc);
-        if (top_ref != 0)
-            top.init_from_ref(top_ref);
-        return Group::get_history_ref(top);
-    }
-
-    static void set_history_parent(Group& group, Array& history_root) noexcept
-    {
-        group.set_history_parent(history_root);
-    }
-
-    static void prepare_history_parent(Group& group, Array& history_root, int history_type)
-    {
-        group.prepare_history_parent(history_root, history_type); // Throws
-    }
-
-    static int get_file_format_version(const Group& group) noexcept
-    {
-        return group.get_file_format_version();
-    }
-
-    static void set_file_format_version(Group& group, int file_format_version) noexcept
-    {
-        group.set_file_format_version(file_format_version);
-    }
-
-    static int get_committed_file_format_version(const Group& group) noexcept
-    {
-        return group.get_committed_file_format_version();
-    }
-
-    static int get_target_file_format_version_for_session(int current_file_format_version,
-                                                          int history_type) noexcept
-    {
-        return Group::get_target_file_format_version_for_session(current_file_format_version,
-                                                                 history_type);
-    }
-
-    static void upgrade_file_format(Group& group, int target_file_format_version)
-    {
-        group.upgrade_file_format(target_file_format_version); // Throws
-    }
-
 };
 
 
