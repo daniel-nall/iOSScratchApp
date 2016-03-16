@@ -59,7 +59,13 @@ class MusicPlayerViewController: UIViewController, MBPlayerManagerDelegate {
     
     func didStartNewSong() {
         if let imageURL = MBPlayerManager.sharedInstance.currentSong?.album?.image?.getImageURL(.LargeImage), let duration = MBPlayerManager.sharedInstance.currentSong?.duration {
-            albumImage.sd_setImageWithURL(NSURL(string: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor()))
+            let range = imageURL.rangeOfString("http")
+            if let theRange = range where theRange.startIndex == imageURL.startIndex { // imageURL starts with "http" (remote url)
+                albumImage.sd_setImageWithURL(NSURL(string: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor()))
+            } else {
+                albumImage.sd_setImageWithURL(NSURL(fileURLWithPath: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor()))
+            }
+            
             if let durationFloat = Float(duration) {
                 seekBar.maximumValue = durationFloat
             }

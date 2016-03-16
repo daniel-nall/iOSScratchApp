@@ -12,8 +12,8 @@ class MBImage: Object, Mappable {
     dynamic var fileName: String?
     dynamic var id: String?
     dynamic var smallImageURL: String?
-    dynamic var largeLocalPath: String?
-    dynamic var smallLocalPath: String?
+    dynamic var largeLocalFileName: String?
+    dynamic var smallLocalFileName: String?
     dynamic var RLMDelete = false
     
     required convenience init?(_ map: Map) {
@@ -30,7 +30,9 @@ class MBImage: Object, Mappable {
     func getImageURL(size: ImageSize) -> String? {
         switch size {
         case .SmallImage:
-            if let path = smallLocalPath {
+            if let localFile = smallLocalFileName {
+                let documentsDir = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
+                let path = documentsDir.URLByAppendingPathComponent(localFile).path
                 return path
             } else {
                 if let path = smallImageURL {
@@ -39,7 +41,9 @@ class MBImage: Object, Mappable {
             }
             break
         case .LargeImage:
-            if let path = largeLocalPath {
+            if let localFile = largeLocalFileName {
+                let documentsDir = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
+                let path = documentsDir.URLByAppendingPathComponent(localFile).path
                 return path
             } else {
                 if let path = basePath, let file = fileName {

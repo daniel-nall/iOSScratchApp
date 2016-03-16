@@ -11,7 +11,7 @@ class Song: Object, Mappable {
     
     dynamic var album: Album?
     
-    dynamic var songURL: String?
+    dynamic var songFile: String?
     
     dynamic var RLMDelete = false
     
@@ -26,5 +26,15 @@ class Song: Object, Mappable {
         duration <- map["duration"]
         featured <- map["featured"]
         album <- map["album"]
+    }
+    
+    func getLocalPathForSong() -> String? {
+        if let songFileName = songFile {
+            let documentsDir = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
+            let path = documentsDir.URLByAppendingPathComponent(songFileName).path
+            return path
+        } else {
+            return nil
+        }
     }
 }
