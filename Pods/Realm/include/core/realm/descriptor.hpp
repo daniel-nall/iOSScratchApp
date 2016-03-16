@@ -573,8 +573,8 @@ inline void Descriptor::insert_column(size_t col_ndx, DataType type, StringData 
     if (REALM_UNLIKELY(tf::is_link_type(ColumnType(type))))
         throw LogicError(LogicError::illegal_type);
 
-    LinkTargetInfo invalid_link;
-    tf::insert_column(*this, col_ndx, type, name, invalid_link, nullable); // Throws
+    Table* link_target_table = nullptr;
+    tf::insert_column(*this, col_ndx, type, name, link_target_table, nullable); // Throws
     adj_insert_column(col_ndx);
     if (subdesc && type == type_Table)
         *subdesc = get_subdescriptor(col_ndx);
@@ -609,8 +609,7 @@ inline void Descriptor::insert_column_link(size_t col_ndx, DataType type, String
     if (origin_group != target_group)
         throw LogicError(LogicError::group_mismatch);
 
-    LinkTargetInfo link(&target);
-    tf::insert_column(*this, col_ndx, type, name, link); // Throws
+    tf::insert_column(*this, col_ndx, type, name, &target); // Throws
     adj_insert_column(col_ndx);
 
     tf::set_link_type(*get_root_table(), col_ndx, link_type); // Throws

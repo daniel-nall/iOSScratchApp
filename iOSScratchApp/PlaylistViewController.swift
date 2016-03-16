@@ -58,7 +58,10 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
                     cell.albumImage.fadeIn(completion: nil)
                 }
             } else {
-                cell.albumImage.sd_setImageWithURL(NSURL(fileURLWithPath: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor()))
+                cell.albumImage.sd_setImageWithURL(NSURL(fileURLWithPath: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor())) {
+                    _ in
+                    cell.albumImage.fadeIn(completion: nil)
+                }
             }
         }
         return cell
