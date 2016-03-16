@@ -11,11 +11,11 @@ PODS:
   - Fabric (1.6.5)
   - ObjectMapper (1.1.1)
   - ReachabilitySwift (2.3.3)
-  - Realm (0.98.3):
-    - Realm/Headers (= 0.98.3)
-  - Realm/Headers (0.98.3)
-  - RealmSwift (0.98.3):
-    - Realm (= 0.98.3)
+  - Realm (0.98.5):
+    - Realm/Headers (= 0.98.5)
+  - Realm/Headers (0.98.5)
+  - RealmSwift (0.98.5):
+    - Realm (= 0.98.5)
   - SDWebImage (3.7.5):
     - SDWebImage/Core (= 3.7.5)
   - SDWebImage/Core (3.7.5)
@@ -28,7 +28,7 @@ DEPENDENCIES:
   - Crashlytics (= 3.7.0)
   - Fabric (= 1.6.5)
   - ReachabilitySwift (= 2.3.3)
-  - RealmSwift (= 0.98.3)
+  - RealmSwift (= 0.98.5)
   - SDWebImage (~> 3.7)
 
 SPEC CHECKSUMS:
@@ -40,8 +40,8 @@ SPEC CHECKSUMS:
   Fabric: 338ffd3c2afcab120638907b4251189de9ad17b3
   ObjectMapper: 4143abed1dbd49b73d75092fe8fa1c88ed6434b7
   ReachabilitySwift: e0f6b6f280effb47731acfaaa2d5ffe223703793
-  Realm: c6a7d00221a2d5177810a674aebd40c5e0b70b0f
-  RealmSwift: d6ecad6e4c2a645d6ac956c2c7e9efb375f39c31
+  Realm: db08379969e45cea2edd1c3c0a090fe9e22d2d2f
+  RealmSwift: cb11ad1c35e15dc982f2dbf5afe2a3124193a358
   SDWebImage: 69c6303e3348fba97e03f65d65d4fbc26740f461
 
 COCOAPODS: 0.39.0

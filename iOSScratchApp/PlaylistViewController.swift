@@ -58,12 +58,6 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
                     cell.albumImage.fadeIn(completion: nil)
                 }
             } else {
-//                let documentsDir = applicationDocumentsDirectory()
-//                let filePath = documentsDir!.URLByAppendingPathComponent((playlist.RLMsongs[indexPath.row].album?.image?.smallLocalFileName)!)
-//                print(filePath)
-//                print(imageURL)
-                
-                //cell.albumImage.image = UIImage(contentsOfFile: imageURL)
                 cell.albumImage.sd_setImageWithURL(NSURL(fileURLWithPath: imageURL), placeholderImage: UIColor.imageFromColor(UIColor.grayColor()))
             }
         }

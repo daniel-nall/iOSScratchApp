@@ -33,7 +33,6 @@ class MBImage: Object, Mappable {
             if let localFile = smallLocalFileName {
                 let documentsDir = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
                 let path = documentsDir.URLByAppendingPathComponent(localFile).path
-                print("small: \(path)")
                 return path
             } else {
                 if let path = smallImageURL {
@@ -45,7 +44,6 @@ class MBImage: Object, Mappable {
             if let localFile = largeLocalFileName {
                 let documentsDir = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
                 let path = documentsDir.URLByAppendingPathComponent(localFile).path
-                print("large: \(path)")
                 return path
             } else {
                 if let path = basePath, let file = fileName {

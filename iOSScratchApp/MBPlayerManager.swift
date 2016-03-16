@@ -114,7 +114,7 @@ class MBPlayerManager: NSObject {
     }
     
     func fetchSongURL(index: Int, completion: (() -> Void)?) {
-        if let songURL = self.currentSong?.songFile {
+        if let songURL = self.currentSong?.getLocalPathForSong() {
             self.setupAudioPlayer(songURL)
             self.delegate?.didStartNewSong()
             completion?()
