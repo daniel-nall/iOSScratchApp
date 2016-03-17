@@ -25,7 +25,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     override func viewWillDisappear(animated: Bool) {
-        MBRealmManager.sharedInstance.cleanRealm()
+        MBRealmManager().cleanRealm()
     }
     
     func didRetrievePlaylist() {
@@ -38,7 +38,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
             }
         }
         
-        downloadSwitch.on = MBRealmManager.sharedInstance.isPlaylistSaved(playlist)
+        downloadSwitch.on = MBRealmManager().isPlaylistSaved(playlist)
         downloadSwitch.enabled = true
     }
     
@@ -85,7 +85,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func fetchPlaylist(completion: () -> Void) {
         if let id = playlistId {
-            MBRealmManager.sharedInstance.loadPlaylistFromRealm(id) {
+            MBRealmManager().loadPlaylistFromRealm(id) {
                 valid, result in
                 if valid {
                     self.playlist = result
@@ -105,9 +105,9 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     
     @IBAction func downloadTapped(sender: UISwitch) {
         if sender.on {
-            MBRealmManager.sharedInstance.addPlaylist(playlist)
+            MBRealmManager().addPlaylist(playlist)
         } else {
-            MBRealmManager.sharedInstance.deletePlaylist(playlist)
+            MBRealmManager().deletePlaylist(playlist)
         }
     }
 }

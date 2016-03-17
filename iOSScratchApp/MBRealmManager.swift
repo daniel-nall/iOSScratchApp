@@ -2,28 +2,31 @@ import Foundation
 import RealmSwift
 
 class MBRealmManager {
-    static let sharedInstance = MBRealmManager()
     
-    let realm = try! Realm()
+    var realm: Realm?
+    
+    init() {
+        realm = try! Realm()
+    }
     
     // MARK: add functions
     func addPlaylist(playlist: Playlist) {
-        try! realm.write {
-            realm.add(playlist)
+        try! realm!.write {
+            realm!.add(playlist)
         }
         
         MBDownloadManger.sharedInstance.addDownloadQueue(playlist)
     }
     
     func addDownloadQueueToRealm(queue: DownloadQueue) {
-        try! realm.write {
-            realm.add(queue)
+        try! realm!.write {
+            realm!.add(queue)
         }
     }
     
     // MARK: load functions
     func loadPlaylistFromRealm(id: String, completion: (Bool, Playlist) -> Void) {
-        if let result = realm.objects(Playlist).filter("id == '\(id)'").first {
+        if let result = realm!.objects(Playlist).filter("id == '\(id)'").first {
             completion(true, result)
         } else {
             completion(false, Playlist())
@@ -32,7 +35,7 @@ class MBRealmManager {
     
     // MARK: helper functions
     func isPlaylistSaved(playlist: Playlist) -> Bool {
-        guard let id = playlist.id, let _ = realm.objects(Playlist).filter("id == '\(id)'").first else {
+        guard let id = playlist.id, let _ = realm!.objects(Playlist).filter("id == '\(id)'").first else {
             return false
         }
         return true
@@ -40,8 +43,8 @@ class MBRealmManager {
     
     // MARK: update functions
     func updateLocalSongFile(id: String, localFile: String) {
-        let songs = realm.objects(Song).filter("id == '\(id)'")
-        try! realm.write {
+        let songs = realm!.objects(Song).filter("id == '\(id)'")
+        try! realm!.write {
             for song in songs {
                 song.songFile = localFile
             }
@@ -49,8 +52,8 @@ class MBRealmManager {
     }
     
     func updateLargeImageFile(id: String, localFile: String) {
-        let songs = realm.objects(Song).filter("id == '\(id)'")
-        try! realm.write {
+        let songs = realm!.objects(Song).filter("id == '\(id)'")
+        try! realm!.write {
             for song in songs {
                 song.album?.image?.largeLocalFileName = localFile
             }
@@ -58,8 +61,8 @@ class MBRealmManager {
     }
     
     func updateSmallImageFile(id: String, localFile: String) {
-        let songs = realm.objects(Song).filter("id == '\(id)'")
-        try! realm.write {
+        let songs = realm!.objects(Song).filter("id == '\(id)'")
+        try! realm!.write {
             for song in songs {
                 song.album?.image?.smallLocalFileName = localFile
             }
@@ -68,7 +71,7 @@ class MBRealmManager {
     
     // MARK: delete functions
     func deletePlaylist(playlist: Playlist) {
-        try! realm.write {
+        try! realm!.write {
             for song in playlist.RLMsongs {
                 song.RLMDelete = true
                 song.album?.RLMDelete = true
@@ -82,27 +85,27 @@ class MBRealmManager {
     }
     
     func deleteDownloadQueue(queue: DownloadQueue) {
-        try! realm.write {
+        try! realm!.write {
             for download in queue.queue {
-                realm.delete(download)
+                realm!.delete(download)
             }
-            realm.delete(queue)
+            realm!.delete(queue)
         }
     }
     
     func cleanRealm() {
-        let songsToDelete = realm.objects(Song).filter("RLMDelete == true")
-        let playlistsToDelete = realm.objects(Playlist).filter("RLMDelete == true")
-        let albumsToDelete = realm.objects(Album).filter("RLMDelete == true")
-        let artistsToDelete = realm.objects(Artist).filter("RLMDelete == true")
-        let imagesToDelete = realm.objects(MBImage).filter("RLMDelete == true")
+        let songsToDelete = realm!.objects(Song).filter("RLMDelete == true")
+        let playlistsToDelete = realm!.objects(Playlist).filter("RLMDelete == true")
+        let albumsToDelete = realm!.objects(Album).filter("RLMDelete == true")
+        let artistsToDelete = realm!.objects(Artist).filter("RLMDelete == true")
+        let imagesToDelete = realm!.objects(MBImage).filter("RLMDelete == true")
         
-        try! realm.write {
-            realm.delete(songsToDelete)
-            realm.delete(playlistsToDelete)
-            realm.delete(albumsToDelete)
-            realm.delete(artistsToDelete)
-            realm.delete(imagesToDelete)
+        try! realm!.write {
+            realm!.delete(songsToDelete)
+            realm!.delete(playlistsToDelete)
+            realm!.delete(albumsToDelete)
+            realm!.delete(artistsToDelete)
+            realm!.delete(imagesToDelete)
         }
     }
 }

@@ -31,9 +31,7 @@ class MBImage: Object, Mappable {
         switch size {
         case .SmallImage:
             if let localFile = smallLocalFileName {
-                let documentsDir = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
-                let path = documentsDir.URLByAppendingPathComponent(localFile).path
-                return path
+                return LocalFile.applicationDocumentsDirectory(localFile)
             } else {
                 if let path = smallImageURL {
                     return path
@@ -42,9 +40,7 @@ class MBImage: Object, Mappable {
             break
         case .LargeImage:
             if let localFile = largeLocalFileName {
-                let documentsDir = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
-                let path = documentsDir.URLByAppendingPathComponent(localFile).path
-                return path
+                return LocalFile.applicationDocumentsDirectory(localFile)
             } else {
                 if let path = basePath, let file = fileName {
                     return "\(path)/\(file)"
