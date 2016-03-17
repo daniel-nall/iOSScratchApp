@@ -30,9 +30,7 @@ class Song: Object, Mappable {
     
     func getLocalPathForSong() -> String? {
         if let songFileName = songFile {
-            let documentsDir = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)[0]
-            let path = documentsDir.URLByAppendingPathComponent(songFileName).path
-            return path
+            return LocalFile.applicationDocumentsDirectory(songFileName)
         } else {
             return nil
         }

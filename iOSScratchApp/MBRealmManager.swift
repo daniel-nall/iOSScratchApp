@@ -95,8 +95,24 @@ class MBRealmManager {
     
     func cleanRealm() {
         let songsToDelete = realm!.objects(Song).filter("RLMDelete == true")
+        for song in songsToDelete {
+            if let songFileName = song.songFile, let songPath = LocalFile.applicationDocumentsDirectory(songFileName), let songURL = NSURL(string: songPath) {
+                LocalFile.deleteFileIfExists(songURL)
+            }
+        }
+        
         let playlistsToDelete = realm!.objects(Playlist).filter("RLMDelete == true")
         let albumsToDelete = realm!.objects(Album).filter("RLMDelete == true")
+        for album in albumsToDelete {
+            if let smallImage = album.image?.smallLocalFileName, let smallImagePath = LocalFile.applicationDocumentsDirectory(smallImage), let smallImageURL = NSURL(string: smallImagePath) {
+                LocalFile.deleteFileIfExists(smallImageURL)
+            }
+            
+            if let largeImage = album.image?.largeLocalFileName, let largeImagePath = LocalFile.applicationDocumentsDirectory(largeImage), let largeImageURL = NSURL(string: largeImagePath) {
+                LocalFile.deleteFileIfExists(largeImageURL)
+            }
+        }
+        
         let artistsToDelete = realm!.objects(Artist).filter("RLMDelete == true")
         let imagesToDelete = realm!.objects(MBImage).filter("RLMDelete == true")
         
