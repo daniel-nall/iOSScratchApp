@@ -13,7 +13,7 @@ class LocalFile {
         let fileExists = fm.fileExistsAtPath(fileURL.path!)
         if fileExists {
             do {
-                try fm.removeItemAtURL(fileURL)
+                try fm.removeItemAtPath(fileURL.path!)
                 print("File deleted successfully:\n\(fileURL.path!)")
             }
             catch {
