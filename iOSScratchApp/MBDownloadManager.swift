@@ -24,7 +24,7 @@ class MBDownloadManger {
                     
                     if queue.queue.count == playlist.RLMsongs.count {
                         self.downloadQueueList.append(queue)
-                        MBRealmManager.sharedInstance.addDownloadQueueToRealm(queue)
+                        MBRealmManager().addDownloadQueueToRealm(queue)
                         if self.downloadQueueList.count == 1 {
                             self.beginDownload()
                         }
@@ -37,7 +37,7 @@ class MBDownloadManger {
     // MARK: outer loop
     func beginDownload() {
         self.downloadItem(self.downloadQueueList[0], currentItem: 0) {
-            MBRealmManager.sharedInstance.deleteDownloadQueue(self.downloadQueueList[0])
+            MBRealmManager().deleteDownloadQueue(self.downloadQueueList[0])
             self.downloadQueueList.removeAtIndex(0)
             if !self.downloadQueueList.isEmpty {
                 self.beginDownload()
@@ -60,7 +60,7 @@ class MBDownloadManger {
             download(songURL) {
                 file in
                 if let fileName = file {
-                    MBRealmManager.sharedInstance.updateLocalSongFile(songId, localFile: fileName)
+                    MBRealmManager().updateLocalSongFile(songId, localFile: fileName)
                 }
                 dispatch_group_leave(downloadGroup)
             }
@@ -69,7 +69,7 @@ class MBDownloadManger {
             download(largeImagePath) {
                 file in
                 if let fileName = file {
-                    MBRealmManager.sharedInstance.updateLargeImageFile(songId, localFile: fileName)
+                    MBRealmManager().updateLargeImageFile(songId, localFile: fileName)
                 }
                 dispatch_group_leave(downloadGroup)
             }
@@ -78,7 +78,7 @@ class MBDownloadManger {
             download(smallImagePath) {
                 file in
                 if let fileName = file {
-                    MBRealmManager.sharedInstance.updateSmallImageFile(songId, localFile: fileName)
+                    MBRealmManager().updateSmallImageFile(songId, localFile: fileName)
                 }
                 dispatch_group_leave(downloadGroup)
             }

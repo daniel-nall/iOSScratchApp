@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		243AEF71C464C77BB561C1FF /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 337AF362E094C85501CDEF56 /* Pods.framework */; };
+		4C12C66A1C9AFE79001B4D67 /* LocalFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C12C6691C9AFE79001B4D67 /* LocalFile.swift */; };
 		4C16EEBC1C516E9700870658 /* LoginModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C16EEBB1C516E9700870658 /* LoginModel.swift */; };
 		4C16EEBF1C52A68700870658 /* PlaylistCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C16EEBE1C52A68700870658 /* PlaylistCollectionViewController.swift */; };
 		4C16EEC11C52BA0D00870658 /* PlaylistModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C16EEC01C52BA0D00870658 /* PlaylistModel.swift */; };
@@ -41,6 +42,7 @@
 /* Begin PBXFileReference section */
 		06BC7D026D97999D4194B94A /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		337AF362E094C85501CDEF56 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C12C6691C9AFE79001B4D67 /* LocalFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocalFile.swift; sourceTree = "<group>"; };
 		4C16EEBB1C516E9700870658 /* LoginModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginModel.swift; sourceTree = "<group>"; };
 		4C16EEBE1C52A68700870658 /* PlaylistCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistCollectionViewController.swift; sourceTree = "<group>"; };
 		4C16EEC01C52BA0D00870658 /* PlaylistModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistModel.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 				4CF478461C5FF6A6008B0BE3 /* MBPlayerManager.swift */,
 				4C49BBB01C6A9ACF005CF3BC /* MBRealmManager.swift */,
 				4C49BBB21C6D1027005CF3BC /* MBDownloadManager.swift */,
+				4C12C6691C9AFE79001B4D67 /* LocalFile.swift */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -362,6 +365,7 @@
 				4C16EEC51C52C34E00870658 /* PlaylistCollectionViewCell.swift in Sources */,
 				4C4F76F91C4EB65E0056D610 /* MainViewController.swift in Sources */,
 				4C16EEBF1C52A68700870658 /* PlaylistCollectionViewController.swift in Sources */,
+				4C12C66A1C9AFE79001B4D67 /* LocalFile.swift in Sources */,
 				4C4F76F11C4D82B10056D610 /* LoginViewController.swift in Sources */,
 				4C2129371C5699F2008E0810 /* PlaylistTableViewCell.swift in Sources */,
 				4C49BBB51C6D1E41005CF3BC /* DownloadModel.swift in Sources */,
